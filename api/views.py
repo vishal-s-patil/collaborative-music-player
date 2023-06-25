@@ -32,9 +32,11 @@ class CreateRoomView(APIView):
                 room.guest_can_pause = guest_can_pause
                 room.votes_to_skip = votes_to_skip
                 room.save(update_fields=['guest_can_pause', 'votes_to_skip'])
+                self.request.session['room_code'] = room.code
             else:
                 room = Room(host=host, guest_can_pause=guest_can_pause, votes_to_skip=votes_to_skip)
                 room.save()
+                self.request.session['room_code'] = room.code
 
         return Response(RoomSerializer(room).data, status=status.HTTP_201_CREATED)
 
@@ -56,3 +58,24 @@ class GetRoom(APIView):
                 return Response({"Room not found": "Invalid room code"}, status=status.HTTP_404_NOT_FOUND)
         else:
             return Response({"Bad request": "Code parameter not found"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class JoinRoom(APIView):
+    serializer_class = RoomSerializer
+
+    def post(self, request):
+        if not self.request.session.exists(self.request.session.session_key):
+            self.request.session.create()
+
+        code = request.data.get('code')
+
+        if code is not None:
+            rooms = Room.objects.filter(code=code)
+
+            if len(rooms) > 0:
+                self.request.session['room_code'] = code
+                return Response({'message': 'Room Joined!'}, status=status.HTTP_200_OK)
+
+            return Response({"Code Not Found": "room with code does not exists"}, status=status.HTTP_404_NOT_FOUND)
+
+        return Response({"code parameter not found": "url must include code parameter"}, status=status.HTTP_400_BAD_REQUEST)
