@@ -23,5 +23,6 @@ urlpatterns = [
     path('api/', include('api.urls')),
     path('', index),
     path('join/', index),
-    path('create/', index)
+    path('create/', index),
+    path('room/<str:code>', index)
 ]
