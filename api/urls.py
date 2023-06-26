@@ -9,4 +9,5 @@ urlpatterns = [
     path('user-in-room', views.UserInRoom.as_view()),
     path('leave-room', views.LeaveRoom.as_view()),
     path('update-room', views.UpdateRoom.as_view()),
+    path('delete', views.ClearRoom.as_view())
 ]

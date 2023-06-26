@@ -26,7 +26,11 @@ SECRET_KEY = 'django-insecure-_7w*3nsw5l59!k+2nco$8tbtb30o+e=ken5+nmyz&@p8&l!+0y
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_HEADERS = ['Authorization', 'Content-Type', 'credentials']
+
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -40,6 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'api.apps.ApiConfig',
     'rest_framework',
+    'spotify.apps.SpotifyConfig',
+    'music_controller.apps.MusicControllerConfig'
 ]
 
 MIDDLEWARE = [

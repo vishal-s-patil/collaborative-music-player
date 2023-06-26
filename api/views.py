@@ -34,10 +34,12 @@ class CreateRoomView(APIView):
                 room.votes_to_skip = votes_to_skip
                 room.save(update_fields=['guest_can_pause', 'votes_to_skip'])
                 self.request.session['room_code'] = room.code
+                print('room-create', self.request.session['room_code'])
             else:
                 room = Room(host=host, guest_can_pause=guest_can_pause, votes_to_skip=votes_to_skip)
                 room.save()
                 self.request.session['room_code'] = room.code
+                print('room-update', self.request.session['room_code'])
 
         return Response(RoomSerializer(room).data, status=status.HTTP_201_CREATED)
 
@@ -49,10 +51,15 @@ class GetRoom(APIView):
     def get(self, request):
         code = request.GET.get(self.lookup_url_kwargs)
 
+        if not self.request.session.exists(self.request.session.session_key):
+            self.request.session.create()
+
         if code is not None:
             room = Room.objects.filter(code=code)
             if len(room) > 0:
                 data = RoomSerializer(room[0]).data
+                print(self.request.session.session_key)
+                print(room[0].host)
                 data['is_host'] = self.request.session.session_key == room[0].host
                 return Response(data, status=status.HTTP_200_OK)
             else:
@@ -87,10 +94,13 @@ class UserInRoom(APIView):
     def get(self, request):
         if not self.request.session.exists(self.request.session.session_key):
             self.request.session.create()
+            print('new session created', self.request.session.session_key)
 
+        print('called', self.request.session.session_key)
         data = {
             'code': self.request.session.get('room_code')
         }
+        print('code', data['code'])
         return JsonResponse(data, status=status.HTTP_200_OK)
 
 
@@ -135,3 +145,13 @@ class UpdateRoom(APIView):
             return Response(RoomSerializer(room).data, status=status.HTTP_200_OK)
 
         return Response({'Bad Request': "Invalid Data..."}, status=status.HTTP_400_BAD_REQUEST)
+
+
+# helper
+class ClearRoom(APIView):
+
+    def get(self, request):
+        queryset = Room.objects.all()
+        queryset.delete()
+
+        return Response({"msg": "deleted"}, status=status.HTTP_200_OK)

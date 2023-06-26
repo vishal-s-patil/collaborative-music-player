@@ -18,9 +18,12 @@ from django.contrib import admin
 from django.urls import path, include
 from .views import index
 
+app_name = 'music_controller'
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
+    path('spotify/', include('spotify.urls')),
     path('', index),
     path('join/', index),
     path('create/', index),
