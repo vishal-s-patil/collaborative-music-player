@@ -8,4 +8,6 @@ urlpatterns = [
     path('current-song', views.CurrentSong.as_view()),
     path('spotify-tokens', views.SpotifyModelView.as_view()),
     path('clear-spotify-tokens', views.ClearSpotifyTokens.as_view()),
+    path('pause', views.PauseSong.as_view()),
+    path('play', views.PlaySong.as_view()),
 ]
